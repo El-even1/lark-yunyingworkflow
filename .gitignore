@@ -1,0 +1,12 @@
+.cache/
+data/
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
+*.egg-info/
+config.json
+tools/
+.agents/skills/last30days-skill-cn/
+.agents/skills/agent-reach/

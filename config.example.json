@@ -1,0 +1,10 @@
+{
+  "base_name": "爆款话题挖掘·自动化工作台",
+  "base_token": "YOUR_FEISHU_BASE_TOKEN",
+  "base_url": "https://my.feishu.cn/base/YOUR_FEISHU_BASE_TOKEN",
+  "tables": {
+    "keywords": "01_词库池",
+    "candidates": "02_候选爆款池",
+    "deconstruct": "03_爆款拆解库"
+  }
+}

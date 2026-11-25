@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>爆款话题挖掘 · 运营工作台</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #3370ff;
+      --primary-hover: #245bdb;
+      --primary-soft: #eef4ff;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --orange: #ea580c;
+      --orange-soft: #ffedd5;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --purple: #7c3aed;
+      --purple-soft: #f3e8ff;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3370ff, #6366f1);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .brand h1 { margin: 0; font-size: 17px; font-weight: 700; }
+    .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #f9fafb; border-color: #d1d5db; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-green { background: var(--green); border-color: var(--green); color: #fff; }
+    .btn-green:hover { background: #15803d; }
+    .btn-soft-green { background: var(--green-soft); border-color: #bbf7d0; color: #166534; }
+    .btn-soft-orange { background: var(--orange-soft); border-color: #fed7aa; color: #9a3412; }
+    .btn-soft-red { background: var(--red-soft); border-color: #fecaca; color: #991b1b; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+    .kpi-value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.5px; }
+    .kpi-sub { font-size: 12px; color: var(--muted); }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: #fff;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      border: none;
+      background: transparent;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: var(--text); background: #f3f4f6; }
+    .tab.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .card-title { font-size: 15px; font-weight: 600; margin: 0; }
+
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    input[type="text"], input[type="password"], select, textarea {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(51, 112, 255, 0.12); }
+    textarea { width: 100%; resize: vertical; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge-xhs { background: #ffe4e6; color: #be123c; }
+    .badge-dy { background: #e0e7ff; color: #3730a3; }
+    .badge-hot { background: var(--orange-soft); color: #c2410c; }
+    .badge-fake { background: var(--red-soft); color: #b91c1c; }
+    .badge-ok { background: var(--green-soft); color: #15803d; }
+    .badge-gray { background: #f3f4f6; color: #4b5563; }
+
+    .video-list { display: grid; gap: 10px; }
+    .video-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .video-item.is-fake { border-left: 4px solid var(--red); background: #fffbfb; }
+    .video-item.is-hot { border-left: 4px solid var(--orange); }
+    .video-title { font-size: 15px; font-weight: 600; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .video-title a { color: var(--text); text-decoration: none; }
+    .video-title a:hover { color: var(--primary); text-decoration: underline; }
+    .video-meta { font-size: 12px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .metrics-row { display: flex; gap: 12px; margin-top: 8px; font-size: 13px; flex-wrap: wrap; }
+    .metric-chip { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 3px 9px; }
+    .metric-chip b { color: var(--text); }
+    .video-actions { display: flex; flex-direction: column; gap: 6px; min-width: 112px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 12px; }
+    tr:hover td { background: #fafbff; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .video-item { grid-template-columns: 1fr; } }
+
+    .code-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 8px 0;
+    }
+    .trend-output {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      white-space: pre-wrap;
+      font-size: 13px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #111827;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 999;
+      display: none;
+      max-width: 420px;
+    }
+    .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 14px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">爆</div>
+      <div>
+        <h1>爆款话题挖掘 · 运营工作台</h1>
+        <p id="subTitle">直连飞书多维表格 · 零代码选词 / 清洗防刷量 / AI 拆解回流</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn" onclick="refreshAll(true)">🔄 刷新飞书数据</button>
+      <a class="btn" id="feishuAppLink" href="#" target="_blank" style="display:none">📱 飞书应用页面</a>
+      <a class="btn btn-primary" id="feishuLink" href="#" target="_blank">📊 飞书多维表格</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label"><span>01 词库池</span><span>待采 / 总计</span></div>
+        <div class="kpi-value" id="kpiKw">-</div>
+        <div class="kpi-sub" id="kpiKwSub">加载中...</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><span>02 候选爆款池</span><span>🔥高优爆款</span></div>
+        <div class="kpi-value" style="color:var(--orange)" id="kpiHot">-</div>
+        <div class="kpi-sub" id="kpiCandSub">加载中...</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><span>自动防刷量</span><span>⚠️疑似刷量</span></div>
+        <div class="kpi-value" style="color:var(--red)" id="kpiFake">-</div>
+        <div class="kpi-sub">赞≥5千且评赞比&lt;0.5% 自动标红</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><span>03 爆款拆解库</span><span>待AI拆解</span></div>
+        <div class="kpi-value" style="color:var(--purple)" id="kpiDec">-</div>
+        <div class="kpi-sub" id="kpiDecSub">加载中...</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" onclick="switchTab('candidates', this)">🔥 极速筛爆款</button>
+      <button class="tab" onclick="switchTab('keywords', this)">🔍 ① 词库与验热</button>
+      <button class="tab" onclick="switchTab('ingest', this)">📥 ② 万能导入清洗</button>
+      <button class="tab" onclick="switchTab('deconstruct', this)">🧠 ④ 爆款拆解与回流</button>
+      <button class="tab" onclick="switchTab('workbuddy', this)">🤖 接入 WorkBuddy (MCP)</button>
+    </nav>
+
+    <!-- TAB 1: Candidates -->
+    <section id="tab-candidates" class="panel active">
+      <div class="card">
+        <div class="toolbar">
+          <button class="pill active" onclick="setCandFilter('all', this)">全部</button>
+          <button class="pill" onclick="setCandFilter('hot', this)">🔥 高优爆款</button>
+          <button class="pill" onclick="setCandFilter('fake', this)">⚠️ 疑似刷量</button>
+          <button class="pill" onclick="setCandFilter('pending', this)">⏳ 待审</button>
+          <button class="pill" onclick="setCandFilter('approved', this)">✅ 已入库</button>
+          <button class="pill" onclick="setCandFilter('rejected', this)">❌ 已淘汰</button>
+          <select id="candPlat" onchange="loadCandidates()">
+            <option value="全部">全部平台</option>
+            <option value="小红书">小红书</option>
+            <option value="抖音">抖音</option>
+          </select>
+          <input type="text" id="candSearch" placeholder="搜标题 / 账号 / 关键词 / 标签..." oninput="debouncedLoadCand()" style="min-width:220px" />
+        </div>
+        <div id="candList" class="video-list"><div class="empty">正在从飞书加载候选爆款池...</div></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Keywords & 30d Trend -->
+    <section id="tab-keywords" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">➕ 添加新关键词到飞书词库</h2>
+          </div>
+          <textarea id="newKwInput" rows="3" placeholder="输入关键词，用顿号、逗号或换行分隔，例如：&#10;压缩教育成本、美国精英高中、PBL项目制学习、芬兰慢教育"></textarea>
+          <div class="toolbar" style="margin-top:10px; margin-bottom:0">
+            <select id="newKwType">
+              <option value="概念名词">概念名词</option>
+              <option value="地名/国家">地名/国家</option>
+              <option value="痛点场景">痛点场景</option>
+              <option value="平台联想词">平台联想词</option>
+              <option value="话题标签">话题标签</option>
+            </select>
+            <label style="font-size:13px"><input type="checkbox" id="kwPlatXhs" checked /> 小红书</label>
+            <label style="font-size:13px"><input type="checkbox" id="kwPlatDy" checked /> 抖音</label>
+            <button class="btn btn-primary" onclick="addKeywords()">写入飞书词库（自动去重）</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📈 验证近 30 天全网热度（替代草稿箱测标签）</h2>
+          </div>
+          <div class="toolbar">
+            <input type="text" id="trendKw" placeholder="输入要验热的词，如：教育成本" style="flex:1" />
+            <button class="btn btn-primary" id="btnTrend" onclick="runTrend()">开始验热</button>
+          </div>
+          <div id="trendBox" class="trend-output" style="display:none"></div>
+          <p class="hint">调用本地 <code>last30days-skill-cn</code> 跨平台查询近 30 天讨论与升温趋势（耗时约 20~40 秒）。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">词库列表（来自飞书《01_词库池》）</h2>
+          <div class="toolbar" style="margin:0">
+            <select id="kwStatusFilter" onchange="loadKeywords()">
+              <option value="待采">仅看：待采</option>
+              <option value="全部">全部状态</option>
+              <option value="已采">已采</option>
+            </select>
+            <button class="btn btn-sm" onclick="copyPendingKeywords()">📋 复制前 10 个待采词</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>关键词</th><th>词类</th><th>词源</th><th>目标平台</th><th>状态</th><th>轮次</th><th>快捷操作</th></tr>
+            </thead>
+            <tbody id="kwTableBody"><tr><td colspan="7" class="empty">加载中...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Universal Ingest -->
+    <section id="tab-ingest" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📋 方式一：直接粘贴分享口令 / 链接（最省事）</h2>
+          </div>
+          <p class="hint" style="margin-top:0">把小红书或抖音复制的分享文本直接粘进来（多条之间空一行，顺手写上“2.0万赞 1394评 8718藏 2.2万享”也能自动解析），系统会自动提取干净 URL、账号、#标签并防刷量算分！</p>
+          <textarea id="pasteRaw" rows="8" placeholder="示例：&#10;8.28 10/10 hBt:/ 一定要压缩教育成本 #孩子教育 #家庭教育 https://v.douyin.com/RkYlxCuzNqw/&#10;2.0万赞 1394评 8718藏 2.2万享&#10;&#10;（空一行粘贴下一条）"></textarea>
+          <div class="toolbar" style="margin-top:10px">
+            <select id="pastePlat">
+              <option value="">自动识别平台</option>
+              <option value="小红书">小红书</option>
+              <option value="抖音">抖音</option>
+            </select>
+            <input type="text" id="pasteKw" placeholder="命中关键词（选填）" />
+            <input type="text" id="pasteRound" placeholder="轮次（如 11.26第一轮）" />
+            <button class="btn" onclick="previewPaste()">👁️ 清洗预览</button>
+            <button class="btn btn-primary" onclick="commitPaste()">🚀 一键写入飞书表2</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📂 方式二：上传采集文件（MediaCrawler / Agent-Reach / CSV）</h2>
+          </div>
+          <p class="hint" style="margin-top:0">拖入或选择采集工具导出的 <code>.json</code> / <code>.csv</code> 文件，自动完成清洗、防刷量打分、去重并写入飞书《02_候选爆款池》。</p>
+          <div style="border:2px dashed #cbd5e1; border-radius:10px; padding:26px; text-align:center; background:#f8fafc; margin-bottom:12px;">
+            <input type="file" id="uploadFile" accept=".json,.csv,.ndjson,.jsonl" />
+          </div>
+          <div class="toolbar">
+            <select id="uploadPlat">
+              <option value="">自动识别平台</option>
+              <option value="小红书">小红书</option>
+              <option value="抖音">抖音</option>
+            </select>
+            <input type="text" id="uploadKw" placeholder="命中关键词（选填）" />
+            <input type="text" id="uploadRound" placeholder="轮次（如 11.26自动采集）" />
+            <button class="btn btn-primary" onclick="uploadIngest()">📤 上传并一键入库</button>
+          </div>
+          <div id="uploadResult" class="hint"></div>
+        </div>
+      </div>
+
+      <div class="card" id="previewCard" style="display:none">
+        <div class="card-header">
+          <h2 class="card-title">清洗预览（确认无误后点「一键写入飞书表2」）</h2>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>平台</th><th>标题</th><th>账号</th><th>赞/评/藏/享</th><th>自动判定</th><th>干净链接</th></tr>
+            </thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Deconstruct & Reflow -->
+    <section id="tab-deconstruct" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">⚡ 飞轮一键操作（同步入库 → AI 拆解 → 新词回流词库）</h2>
+          <div class="toolbar" style="margin:0">
+            <button class="btn" onclick="syncApproved()">1️⃣ 同步表2【入库】视频到表3</button>
+            <button class="btn btn-green" onclick="runReflow()">🔄 一键把新词回流到表1词库</button>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;">
+          <div style="font-weight:600; font-size:13px; margin-bottom:8px;">🤖 批量 AI 拆解配置（支持 DeepSeek / 豆包火山方舟 / Kimi 等 OpenAI 兼容接口，仅保存在当前浏览器）</div>
+          <div class="toolbar" style="margin:0">
+            <select id="llmPreset" onchange="applyLlmPreset()">
+              <option value="deepseek">DeepSeek (api.deepseek.com)</option>
+              <option value="doubao">豆包火山方舟 (ark.cn-beijing.volces.com)</option>
+              <option value="kimi">Kimi Moonshot (api.moonshot.cn)</option>
+              <option value="custom">自定义 OpenAI 兼容接口</option>
+            </select>
+            <input type="text" id="llmBase" value="https://api.deepseek.com/v1" style="min-width:240px" placeholder="API Base URL" />
+            <input type="text" id="llmModel" value="deepseek-chat" style="width:160px" placeholder="模型名 / Endpoint ID" />
+            <input type="password" id="llmKey" style="min-width:200px" placeholder="粘贴 API Key" />
+            <button class="btn btn-primary" id="btnAiDec" onclick="runAiDeconstruct()">✨ 拆解已勾选视频</button>
+            <button class="btn" onclick="copyForWorkBuddy()">📋 没Key？复制给 WorkBuddy 拆解</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="decCheckAll" onchange="toggleAllDec(this)" /></th>
+                <th>视频标题 / 账号</th>
+                <th>文案状态</th>
+                <th>核心观点</th>
+                <th>内容关键词</th>
+                <th>已回流</th>
+              </tr>
+            </thead>
+            <tbody id="decTableBody"><tr><td colspan="6" class="empty">加载中...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: WorkBuddy MCP Guide -->
+    <section id="tab-workbuddy" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🤖 让运营在 WorkBuddy 里直接“聊天找爆款”（MCP 接入指南）</h2>
+        </div>
+        <p style="font-size:14px; margin-top:0">
+          运营同事不需要懂代码，只需要在 <b>WorkBuddy → 设置 → MCP 服务器</b> 里贴入下面任意一段配置，之后直接在 WorkBuddy 对话框打字就能读写你的飞书多维表格！
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <h3 style="font-size:14px; margin-bottom:4px;">方式 A：团队局域网共享（推荐，1 人启动全员共用）</h3>
+            <p class="hint">在你这台机器双击项目目录的 <code>启动WorkBuddy_MCP服务.bat</code> 后，运营把下方配置粘进 WorkBuddy 的 MCP 设置即可：</p>
+            <div class="code-box" id="wbHttpJson">加载中...</div>
+            <button class="btn btn-primary btn-sm" onclick="copyCode('wbHttpJson')">📋 一键复制局域网 MCP 配置</button>
+          </div>
+          <div>
+            <h3 style="font-size:14px; margin-bottom:4px;">方式 B：本机 WorkBuddy 直接接入（stdio 模式）</h3>
+            <p class="hint">适合本机使用 WorkBuddy，无需额外开后台窗口：</p>
+            <div class="code-box" id="wbStdioJson">加载中...</div>
+            <button class="btn btn-sm" onclick="copyCode('wbStdioJson')">📋 一键复制本机 MCP 配置</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+          <h3 style="font-size:14px; margin-bottom:8px;">💬 接入后，运营在 WorkBuddy 里可以直接这样说话：</h3>
+          <ul style="font-size:13px; color:#374151; line-height:1.9; margin:0; padding-left:20px;">
+            <li>“帮我看一下现在飞书爆款库的整体进度，有哪些高优爆款和疑似刷量？”</li>
+            <li>“从词库里拉 10 个待采词，顺便帮我查一下「教育成本」最近 30 天全网热度。”</li>
+            <li>“把下面这 5 条小红书分享链接帮我清洗、防刷量打分并写入飞书候选池：【粘贴口令】”</li>
+            <li>“帮我读取飞书表 3 里还没拆解核心观点的 5 条爆款文案，逐条拆出核心观点、内容关键词和二创切入点，写回飞书，然后自动把新词回流到词库表！”</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:16px; background:var(--primary-soft); border-radius:10px; padding:12px 16px; font-size:13px;">
+          🌐 <b>团队浏览器工作台地址（同一公司 Wi-Fi / 局域网直接打开）：</b>
+          <span id="lanWebUrl" style="font-weight:700; color:var(--primary); margin-left:6px;">-</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentFilter = 'all';
+    let lastPreviewItems = [];
+    let cachedKeywords = [];
+    let cachedDeconstructs = [];
+    let candTimer = null;
+
+    function toast(msg, ms = 3200) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      clearTimeout(el._t);
+      el._t = setTimeout(() => { el.style.display = 'none'; }, ms);
+    }
+
+    function fmtNum(n) {
+      n = Number(n || 0);
+      if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+      return n.toLocaleString();
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function api(url, opts = {}) {
+      const res = await fetch(url, opts);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || '请求失败');
+      return data;
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (name === 'keywords') loadKeywords();
+      if (name === 'deconstruct') loadDeconstructs();
+      if (name === 'workbuddy') loadWorkBuddyCfg();
+    }
+
+    async function loadSummary(refresh = false) {
+      try {
+        const res = await api('/api/summary' + (refresh ? '?refresh=1' : ''));
+        const d = res.data;
+        const c = d.counts;
+        document.getElementById('feishuLink').href = d.base_url;
+        if (d.app_url) {
+          const appA = document.getElementById('feishuAppLink');
+          appA.href = d.app_url;
+          appA.style.display = 'inline-flex';
+        }
+        document.getElementById('kpiKw').textContent = `${c.keywords_pending} / ${c.keywords_total}`;
+        document.getElementById('kpiKwSub').textContent = `已采 ${c.keywords_done} 个词`;
+        document.getElementById('kpiHot').textContent = c.candidates_hot;
+        document.getElementById('kpiCandSub').textContent = `总计 ${c.candidates_total} 条 · 入库 ${c.candidates_approved} · 待审 ${c.candidates_pending}`;
+        document.getElementById('kpiFake').textContent = c.candidates_fake;
+        document.getElementById('kpiDec').textContent = c.deconstruct_need_ai;
+        document.getElementById('kpiDecSub').textContent = `总计 ${c.deconstruct_total} 条 · 待回流词库 ${c.deconstruct_unreflowed} 条`;
+      } catch (e) {
+        toast('加载看板失败: ' + e.message);
+      }
+    }
+
+    function setCandFilter(mode, btn) {
+      currentFilter = mode;
+      document.querySelectorAll('#tab-candidates .pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      loadCandidates();
+    }
+
+    function debouncedLoadCand() {
+      clearTimeout(candTimer);
+      candTimer = setTimeout(() => loadCandidates(), 250);
+    }
+
+    async function loadCandidates(refresh = false) {
+      const box = document.getElementById('candList');
+      const plat = document.getElementById('candPlat').value;
+      const q = document.getElementById('candSearch').value;
+      const params = new URLSearchParams({ filter: currentFilter, platform: plat, search: q });
+      if (refresh) params.set('refresh', '1');
+      try {
+        const res = await api('/api/candidates?' + params.toString());
+        if (!res.items.length) {
+          box.innerHTML = '<div class="empty">当前筛选条件下暂无视频记录</div>';
+          return;
+        }
+        box.innerHTML = res.items.map(it => {
+          const isFake = (it.warning || '').includes('刷量');
+          const isHot = (it.warning || '').includes('高优');
+          const platBadge = it.platform === '小红书'
+            ? '<span class="badge badge-xhs">小红书</span>'
+            : '<span class="badge badge-dy">抖音</span>';
+          const warnBadge = isFake
+            ? `<span class="badge badge-fake">${esc(it.warning)}</span>`
+            : isHot
+            ? `<span class="badge badge-hot">${esc(it.warning)}</span>`
+            : `<span class="badge badge-gray">${esc(it.warning || '待补数据')}</span>`;
+          const stBadge = it.status === '入库'
+            ? '<span class="badge badge-ok">✅ 已入库</span>'
+            : it.status === '淘汰'
+            ? '<span class="badge badge-gray">❌ 已淘汰</span>'
+            : `<span class="badge badge-gray">${esc(it.status)}</span>`;
+          return `
+            <div class="video-item ${isFake ? 'is-fake' : (isHot ? 'is-hot' : '')}">
+              <div>
+                <div class="video-title">
+                  ${platBadge} ${warnBadge} ${stBadge}
+                  <a href="${esc(it.url)}" target="_blank">${esc(it.title)}</a>
+                </div>
+                <div class="video-meta">
+                  <span>👤 ${esc(it.author || '未知账号')}</span>
+                  <span>🔑 命中词：${esc(it.keyword || '-')}</span>
+                  <span>🗓️ ${esc(it.round || '-')}</span>
+                  ${it.tags ? `<span>🏷️ ${esc(it.tags)}</span>` : ''}
+                </div>
+                <div class="metrics-row">
+                  <span class="metric-chip">爆款分 <b>${fmtNum(it.score)}</b></span>
+                  <span class="metric-chip">👍 赞 <b>${fmtNum(it.likes)}</b></span>
+                  <span class="metric-chip">💬 评 <b>${fmtNum(it.comments)}</b></span>
+                  <span class="metric-chip">⭐ 藏 <b>${fmtNum(it.saves)}</b></span>
+                  <span class="metric-chip">↗️ 享 <b>${fmtNum(it.shares)}</b></span>
+                  ${it.likes > 0 ? `<span class="metric-chip">评赞比 <b>${(Number(it.comment_ratio)*100).toFixed(2)}%</b></span>` : ''}
+                </div>
+              </div>
+              <div class="video-actions">
+                <button class="btn btn-sm btn-soft-green" onclick="setStatus('${it.record_id}','入库')">✅ 标记入库</button>
+                <button class="btn btn-sm btn-soft-orange" onclick="setStatus('${it.record_id}','待复核')">⚠️ 待复核</button>
+                <button class="btn btn-sm btn-soft-red" onclick="setStatus('${it.record_id}','淘汰')">❌ 淘汰</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        box.innerHTML = `<div class="empty">加载失败：${esc(e.message)}</div>`;
+      }
+    }
+
+    async function setStatus(recordId, status) {
+      try {
+        toast('正在同步到飞书...');
+        await api('/api/candidates/status', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ record_id: recordId, status })
+        });
+        toast(`已更新为【${status}】并同步飞书！`);
+        await Promise.all([loadCandidates(), loadSummary()]);
+      } catch (e) {
+        toast('更新失败：' + e.message);
+      }
+    }
+
+    async function loadKeywords(refresh = false) {
+      const st = document.getElementById('kwStatusFilter').value;
+      const body = document.getElementById('kwTableBody');
+      try {
+        const res = await api(`/api/keywords?status=${encodeURIComponent(st)}${refresh ? '&refresh=1' : ''}`);
+        cachedKeywords = res.items;
+        if (!res.items.length) {
+          body.innerHTML = '<tr><td colspan="7" class="empty">暂无关键词</td></tr>';
+          return;
+        }
+        body.innerHTML = res.items.map(k => `
+          <tr>
+            <td><b>${esc(k.keyword)}</b></td>
+            <td>${esc(k.word_type || '-')}</td>
+            <td>${esc(k.source || '-')}</td>
+            <td>${(k.platforms || []).map(p => `<span class="badge ${p==='小红书'?'badge-xhs':'badge-dy'}">${esc(p)}</span>`).join(' ')}</td>
+            <td><span class="badge ${k.status==='待采'?'badge-hot':'badge-ok'}">${esc(k.status)}</span></td>
+            <td>${esc(k.round || '-')}</td>
+            <td><button class="btn btn-sm" onclick="quickTrend('${esc(k.keyword)}')">📈 查30天热度</button></td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        body.innerHTML = `<tr><td colspan="7" class="empty">加载失败：${esc(e.message)}</td></tr>`;
+      }
+    }
+
+    async function addKeywords() {
+      const raw = document.getElementById('newKwInput').value.trim();
+      if (!raw) return toast('请先输入关键词');
+      const plats = [];
+      if (document.getElementById('kwPlatXhs').checked) plats.push('小红书');
+      if (document.getElementById('kwPlatDy').checked) plats.push('抖音');
+      try {
+        toast('正在去重并写入飞书词库...');
+        const res = await api('/api/keywords/add', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            raw_text: raw,
+            word_type: document.getElementById('newKwType').value,
+            platforms: plats
+          })
+        });
+        document.getElementById('newKwInput').value = '';
+        toast(`新增 ${res.data.added_count} 个词（跳过重复 ${res.data.skipped_duplicates.length} 个）`);
+        await Promise.all([loadKeywords(), loadSummary()]);
+      } catch (e) {
+        toast('添加失败：' + e.message);
+      }
+    }
+
+    function copyPendingKeywords() {
+      const top10 = cachedKeywords.filter(k => k.status === '待采').slice(0, 10).map(k => k.keyword).join(',');
+      if (!top10) return toast('当前列表没有待采词');
+      navigator.clipboard.writeText(top10);
+      toast('已复制 10 个待采词：' + top10);
+    }
+
+    function quickTrend(kw) {
+      document.getElementById('trendKw').value = kw;
+      runTrend();
+    }
+
+    async function runTrend() {
+      const kw = document.getElementById('trendKw').value.trim();
+      if (!kw) return toast('请输入关键词');
+      const btn = document.getElementById('btnTrend');
+      const box = document.getElementById('trendBox');
+      btn.disabled = true;
+      btn.textContent = '验热中（约30秒）...';
+      box.style.display = 'block';
+      box.textContent = `正在跨平台检索「${kw}」近 30 天讨论，请稍候...`;
+      try {
+        const res = await api('/api/trend', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ keyword: kw, quick: true })
+        });
+        box.textContent = res.data.report || res.data.log || '未返回内容';
+      } catch (e) {
+        box.textContent = '验热失败：' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '开始验热';
+      }
+    }
+
+    async function previewPaste() {
+      const raw = document.getElementById('pasteRaw').value.trim();
+      if (!raw) return toast('请先粘贴分享链接或文本');
+      try {
+        const res = await api('/api/ingest/preview', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            raw_text: raw,
+            platform: document.getElementById('pastePlat').value,
+            keyword: document.getElementById('pasteKw').value,
+            round_name: document.getElementById('pasteRound').value
+          })
+        });
+        lastPreviewItems = res.items;
+        const card = document.getElementById('previewCard');
+        const body = document.getElementById('previewBody');
+        card.style.display = 'block';
+        if (!res.items.length) {
+          body.innerHTML = '<tr><td colspan="6" class="empty">未识别到有效链接，请确认包含 http(s)://</td></tr>';
+          return;
+        }
+        body.innerHTML = res.items.map(it => `
+          <tr>
+            <td>${esc((it['平台']||[])[0])}</td>
+            <td>${esc(it['视频标题'])}</td>
+            <td>${esc(it['账号'] || '-')}</td>
+            <td>${fmtNum(it['点赞数'])} / ${fmtNum(it['评论数'])} / ${fmtNum(it['收藏数'])} / ${fmtNum(it['分享数'])}</td>
+            <td><span class="badge badge-gray">${esc((it['审核状态']||[])[0])}</span> ${esc(it['备注'])}</td>
+            <td><a href="${esc(it['视频链接'])}" target="_blank">打开</a></td>
+          </tr>
+        `).join('');
+        toast(`识别出 ${res.items.length} 条记录，可点击「一键写入飞书表2」`);
+      } catch (e) {
+        toast('解析失败：' + e.message);
+      }
+    }
+
+    async function commitPaste() {
+      const raw = document.getElementById('pasteRaw').value.trim();
+      if (!raw && !lastPreviewItems.length) return toast('请先粘贴内容');
+      try {
+        toast('正在去重写入飞书《02_候选爆款池》...');
+        const payload = lastPreviewItems.length
+          ? { items: lastPreviewItems, mark_done: true }
+          : {
+              raw_text: raw,
+              platform: document.getElementById('pastePlat').value,
+              keyword: document.getElementById('pasteKw').value,
+              round_name: document.getElementById('pasteRound').value,
+              mark_done: true
+            };
+        const res = await api('/api/ingest/commit', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('pasteRaw').value = '';
+        lastPreviewItems = [];
+        document.getElementById('previewCard').style.display = 'none';
+        toast(`成功入库 ${res.data.inserted} 条（去重跳过 ${res.data.duplicates_skipped} 条）`);
+        await Promise.all([loadCandidates(), loadSummary()]);
+      } catch (e) {
+        toast('写入失败：' + e.message);
+      }
+    }
+
+    async function uploadIngest() {
+      const f = document.getElementById('uploadFile').files[0];
+      if (!f) return toast('请先选择 JSON 或 CSV 文件');
+      const fd = new FormData();
+      fd.append('file', f);
+      fd.append('platform', document.getElementById('uploadPlat').value);
+      fd.append('keyword', document.getElementById('uploadKw').value);
+      fd.append('round_name', document.getElementById('uploadRound').value);
+      fd.append('mark_done', 'true');
+      try {
+        toast('正在上传清洗并写入飞书...');
+        const res = await api('/api/ingest/upload', { method: 'POST', body: fd });
+        document.getElementById('uploadResult').textContent =
+          `✅ 读取 ${res.data.raw_loaded} 条 → 新增入库 ${res.data.inserted} 条，去重跳过 ${res.data.duplicates_skipped} 条，自动标已采词 ${res.data.keywords_marked_done} 个。`;
+        toast(`文件导入成功：新增 ${res.data.inserted} 条！`);
+        await Promise.all([loadCandidates(), loadSummary()]);
+      } catch (e) {
+        toast('上传失败：' + e.message);
+      }
+    }
+
+    async function loadDeconstructs(refresh = false) {
+      const body = document.getElementById('decTableBody');
+      try {
+        const res = await api('/api/deconstruct' + (refresh ? '?refresh=1' : ''));
+        cachedDeconstructs = res.items;
+        if (!res.items.length) {
+          body.innerHTML = '<tr><td colspan="6" class="empty">暂无拆解记录</td></tr>';
+          return;
+        }
+        body.innerHTML = res.items.map(d => `
+          <tr>
+            <td><input type="checkbox" class="dec-chk" value="${esc(d.record_id)}" ${(!d.core_views && d.transcript) ? 'checked' : ''} /></td>
+            <td>
+              <div><b><a href="${esc(d.url)}" target="_blank" style="color:inherit;text-decoration:none">${esc(d.title)}</a></b></div>
+              <div class="hint">${esc(d.platform)} · ${esc(d.author || '未知')} · ${esc(d.metrics)}</div>
+            </td>
+            <td>${d.transcript ? `<span class="badge badge-ok">有文案 (${d.transcript.length}字)</span>` : '<span class="badge badge-gray">缺文案</span>'}</td>
+            <td style="max-width:260px; white-space:pre-line; font-size:12px;">${d.core_views ? esc(d.core_views.slice(0,160)) : '<span class="badge badge-hot">待拆解</span>'}</td>
+            <td style="max-width:180px; font-size:12px;">${esc(d.keywords || '-')}</td>
+            <td>${d.reflowed ? '<span class="badge badge-ok">✅ 已回流</span>' : '<span class="badge badge-gray">未回流</span>'}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">加载失败：${esc(e.message)}</td></tr>`;
+      }
+    }
+
+    function toggleAllDec(master) {
+      document.querySelectorAll('.dec-chk').forEach(c => { c.checked = master.checked; });
+    }
+
+    async function syncApproved() {
+      try {
+        toast('正在同步表2【入库】视频到表3...');
+        const res = await api('/api/deconstruct/sync', { method: 'POST' });
+        toast(`同步完成：新增 ${res.data.synced_new} 条到表3！`);
+        await Promise.all([loadDeconstructs(true), loadSummary(true)]);
+      } catch (e) {
+        toast('同步失败：' + e.message);
+      }
+    }
+
+    async function runReflow() {
+      try {
+        toast('正在去重回流新词到飞书表1...');
+        const res = await api('/api/reflow', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+        toast(`回流完成：新增 ${res.data.new_keywords_added} 个待采词，已标记 ${res.data.deconstructs_marked_reflowed} 条！`);
+        await Promise.all([loadDeconstructs(true), loadSummary(true)]);
+      } catch (e) {
+        toast('回流失败：' + e.message);
+      }
+    }
+
+    function applyLlmPreset() {
+      const p = document.getElementById('llmPreset').value;
+      const base = document.getElementById('llmBase');
+      const model = document.getElementById('llmModel');
+      if (p === 'deepseek') { base.value = 'https://api.deepseek.com/v1'; model.value = 'deepseek-chat'; }
+      if (p === 'doubao') { base.value = 'https://ark.cn-beijing.volces.com/api/v3'; model.value = 'doubao-1-5-pro-32k-250115'; }
+      if (p === 'kimi') { base.value = 'https://api.moonshot.cn/v1'; model.value = 'moonshot-v1-8k'; }
+    }
+
+    async function runAiDeconstruct() {
+      const ids = Array.from(document.querySelectorAll('.dec-chk:checked')).map(c => c.value);
+      if (!ids.length) return toast('请先勾选至少 1 条有文案的视频');
+      const key = document.getElementById('llmKey').value.trim();
+      if (!key) return toast('请填写大模型 API Key，或点右侧按钮复制给 WorkBuddy 拆解');
+      localStorage.setItem('bk_llm_base', document.getElementById('llmBase').value);
+      localStorage.setItem('bk_llm_model', document.getElementById('llmModel').value);
+      localStorage.setItem('bk_llm_key', key);
+
+      const btn = document.getElementById('btnAiDec');
+      btn.disabled = true;
+      btn.textContent = `AI 拆解中 (${ids.length}条)...`;
+      try {
+        const res = await api('/api/deconstruct/ai', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            record_ids: ids.slice(0, 10),
+            api_base: document.getElementById('llmBase').value,
+            api_key: key,
+            model: document.getElementById('llmModel').value
+          })
+        });
+        toast(`AI 拆解完成：成功回写 ${res.data.updated} 条（失败 ${res.data.errors.length} 条）`);
+        await Promise.all([loadDeconstructs(true), loadSummary(true)]);
+      } catch (e) {
+        toast('AI 拆解失败：' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ 拆解已勾选视频';
+      }
+    }
+
+    function copyForWorkBuddy() {
+      const ids = new Set(Array.from(document.querySelectorAll('.dec-chk:checked')).map(c => c.value));
+      const picked = cachedDeconstructs.filter(d => ids.has(d.record_id) && d.transcript).slice(0, 5);
+      if (!picked.length) return toast('请先勾选有文案的视频');
+      const prompt = '请帮我把下面几条教育赛道爆款视频拆解成核心观点（3-5条短句）、内容关键词（5-8个可搜索中长尾名词）、衍生话题标签和二创切入点，并用 bkworkflow MCP 的 save_deconstruct_and_reflow 工具直接写回飞书并回流新词：\n\n'
+        + picked.map((p, i) => `【${i+1}】record_id=${p.record_id}\n标题：${p.title}\n文案：${p.transcript.slice(0, 1500)}`).join('\n\n---\n\n');
+      navigator.clipboard.writeText(prompt);
+      toast(`已复制 ${picked.length} 条待拆解任务，直接粘贴进 WorkBuddy 发送即可！`);
+    }
+
+    async function loadWorkBuddyCfg() {
+      try {
+        const res = await api('/api/workbuddy-config');
+        document.getElementById('wbHttpJson').textContent = JSON.stringify(res.data.workbuddy_http_config, null, 2);
+        document.getElementById('wbStdioJson').textContent = JSON.stringify(res.data.workbuddy_stdio_config, null, 2);
+        document.getElementById('lanWebUrl').textContent = res.data.web_url;
+      } catch (e) {
+        toast('加载 WorkBuddy 配置失败：' + e.message);
+      }
+    }
+
+    function copyCode(id) {
+      navigator.clipboard.writeText(document.getElementById(id).textContent);
+      toast('已复制到剪贴板！');
+    }
+
+    async function refreshAll(force = false) {
+      toast('正在同步飞书最新数据...');
+      await Promise.all([loadSummary(force), loadCandidates(force)]);
+      toast('已同步飞书最新数据');
+    }
+
+    // Restore saved LLM settings (local browser only)
+    if (localStorage.getItem('bk_llm_base')) document.getElementById('llmBase').value = localStorage.getItem('bk_llm_base');
+    if (localStorage.getItem('bk_llm_model')) document.getElementById('llmModel').value = localStorage.getItem('bk_llm_model');
+    if (localStorage.getItem('bk_llm_key')) document.getElementById('llmKey').value = localStorage.getItem('bk_llm_key');
+
+    // Initial load
+    loadSummary();
+    loadCandidates();
+  </script>
+</body>
+</html>
